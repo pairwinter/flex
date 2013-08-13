@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" backgroundAlpha="0" creationComplete="initCreation()">
+	<fx:Script>
+		<![CDATA[
+			import flash.utils.ByteArray;
+			import flash.utils.Timer;
+			import flash.utils.getTimer;
+			
+			[Bindable] private var microphoneList:Array;
+			protected var microphone:Microphone;
+			
+			
+			protected var soundRecording:ByteArray;
+			protected var soundRecordingWAV:ByteArray;
+			private var timer:Timer;
+			protected var soundOutput:Sound;
+			
+		    private var urlLoader:URLLoader;
+			
+			[Bindable]
+			private var baseTimer:int;
+			private var endTime:String = "";
+			
+			private const MIN_MASK:String = "00";
+			private const SEC_MASK:String = "00";
+			private const MS_MASK:String = "000";
+			private const END_TIME:String = "05:00";
+			private const TIMER_INTERVAL:int = 10;
+			
+			private const BACKGROUPD:String = "assets/bg.png";
+			private const RECO_READY:String = "assets/recording.png";
+			private const RECO_DISABLED:String = "assets/recording_disable.png";
+			private const RECO_RECORDING:String = "assets/recording_state.png";
+			private var bRecording:Boolean = false;
+			private var iTimerLength:int =0;
+			private var iCurSec:int =0;
+			
+			private function initCreation():void
+			{
+				timer = new Timer(1000);
+				microphoneList = Microphone.names;
+				timer.addEventListener(TimerEvent.TIMER, onTimerEnabled);
+			}
+			
+			private function setFlashState(_record:int=0, _play:int=0, _stop:int=0):void{
+				switch (_record)
+				{
+					case 0: 
+						applySourceForRecording(RECO_DISABLED);
+						break;
+					case 1: 
+						applySourceForRecording(RECO_READY);
+						break;
+					case 2: 
+						applySourceForRecording(RECO_RECORDING);
+						break;
+				}
+				//applySourceForStop(_stop == 0 ? STOP_DISABLED : STOP_READY);
+			}
+			
+			private function callJsMethod(method:String, _data:String=""):void {
+//				if(method) {
+//				    ExternalInterface.call(method, _data, recorderId);
+//				}
+			}
+			
+			private function setupMicrophone():void {
+				if (microphoneList.length<=0) {
+					cvsError.visible=true;
+					cvsMain.visible = false;
+					return;
+				}
+								
+				microphone = Microphone.getEnhancedMicrophone();
+				microphone.rate = 44;
+				microphone.setUseEchoSuppression(true);
+				microphone.setLoopBack(false);
+				microphone.setSilenceLevel(0,0);
+				microphone.gain=75;
+				
+				
+				debugerMethod("Microphone is allow :" + !microphone.muted);
+				if(microphone.muted){
+					microphone.addEventListener(StatusEvent.STATUS, onMicStatus);
+				}else{
+					
+				}
+				startMicRecording();
+			}
+			
+			private function debugerMethod(message:String=""):void {
+				ExternalInterface.call("debugerMethod", message);
+			}
+			
+			
+			
+			private function onMicStatus(event:StatusEvent):void
+			{
+				if (event.code == "Microphone.Unmuted")
+				{
+					trace("Microphone access was allowed.");
+					iCurSec =0;
+					baseTimer = getTimer();				
+					timer.start();
+					applySourceForRecording(RECO_RECORDING);
+				} 
+				else if (event.code == "Microphone.Muted") 
+				{
+					trace("Microphone access was denied."); 
+					applySourceForRecording(RECO_DISABLED);
+				}
+				debugerMethod("Microphone is allow :" + !microphone.muted);
+			} 
+			
+			private function startMicRecording():void
+			{
+				lbTimer.text = "00:00";
+				baseTimer = getTimer();	
+				soundRecording = new ByteArray();
+				soundRecordingWAV = new ByteArray();
+				microphone.addEventListener(SampleDataEvent.SAMPLE_DATA, gotMicData);
+			}
+			
+			private function gotMicData(micData:SampleDataEvent):void
+			{
+//				debugerMethod("recording : " + micData.data.length);
+				lbStatus.text = "recording..."; 
+				timer.start();
+				applySourceForRecording(RECO_RECORDING);
+				if (baseTimer==0)
+					baseTimer = getTimer();
+				if (lbTimer.text == END_TIME)
+				{
+					stopMicRecording();
+					return;
+				}
+				while(micData.data.bytesAvailable) {
+					var sample:Number = micData.data.readFloat();      
+					soundRecording.writeFloat(sample);
+				}
+			}
+			
+			private function record():void
+			{
+				if (imgRecord.source == RECO_DISABLED)
+					return;
+				if (!bRecording)
+				{
+					bRecording = true;
+					setupMicrophone();
+				} else {
+					bRecording = false;
+					applySourceForRecording(RECO_READY);
+					stopMicRecording();
+					iCurSec = 0;
+				}
+			}
+			
+			private function applySourceForRecording(source:String):void {
+				imgRecord.source = source;
+				if(source == RECO_READY) {
+					imgRecord.toolTip = "Click to start recording";
+					imgRecord.buttonMode = true;
+				} else if(source == RECO_RECORDING) {
+					imgRecord.toolTip = "Click to stop recording";
+					imgRecord.buttonMode = true;
+				} else {
+					imgRecord.toolTip = "";
+					imgRecord.buttonMode = false;
+				}
+			}
+			
+			private function onTimerEnabled(event:TimerEvent):void
+			{
+				var d:Date = new Date(getTimer() - baseTimer);
+				var min:String = String(MIN_MASK + d.minutes).substr(-MIN_MASK.length);
+				var sec:String = String(SEC_MASK + d.seconds).substr(-SEC_MASK.length);
+				var ms:String = String(MS_MASK + d.milliseconds).substr(-MS_MASK.length);
+				lbTimer.text = String(min + ":" + sec  );
+				iCurSec +=1;
+                applySourceForRecording(RECO_RECORDING);
+				
+			}
+
+			protected function stopMicRecording():void
+			{
+				timer.stop();
+				endTime = lbTimer.text;
+				baseTimer = 0;
+				microphone.removeEventListener(SampleDataEvent.SAMPLE_DATA, gotMicData);
+				saveWAV();
+			}
+			
+			private function convertToWAV():void
+			{
+				var wavWriter:WAVWriter = new WAVWriter(); 
+				if (soundRecording.length <=0) 
+					return;
+				soundRecording.position = 0;  
+				wavWriter.numOfChannels = 1;   
+				wavWriter.sampleBitRate = 16;   
+				wavWriter.samplingRate = 44100;
+				soundRecordingWAV.position = 0;
+				wavWriter.processSamples( soundRecordingWAV, soundRecording, 44100, 1 );
+				soundRecordingWAV.position = 0;
+			}
+			
+			private function saveWAV():void{
+				convertToWAV();
+				var fileReference:FileReference = new FileReference();
+				fileReference.save(soundRecordingWAV,"test.wav");
+			}
+			
+		]]>
+	</fx:Script>
+	<mx:Canvas id="cvsMain" backgroundAlpha="0" visible="true" > 
+		<mx:Image source="{BACKGROUPD}"  />	
+		<s:Label id="lbTimer" color="#FFFFFF" text="00:00" x="10" y="8"/>
+		<s:Label id="lbStatus" color="#FFFFFF" text="" x="80" y="8"/>
+		<mx:Canvas backgroundAlpha="0">
+			<mx:Image id="imgRecord" source="{RECO_READY}" x="60" y="30" buttonMode="true" mouseChildren="false" click="record()" toolTip="Click to start recording"/>
+		</mx:Canvas>
+		<!--mx:Canvas backgroundAlpha="0">
+			<mx:Image id="imgStop" source="{STOP_DISABLED}" x="100" y="30"  buttonMode="true" mouseChildren="false" click="stopPlay()" toolTip=""/>
+		</mx:Canvas-->		
+	</mx:Canvas>
+	<mx:Canvas id="cvsError" backgroundAlpha="0" visible="false" >
+		<mx:Label text="Please insert you microphone" color="red" />				
+	</mx:Canvas>
+	
+</s:Application>
