@@ -38,9 +38,9 @@
 			private const END_TIME:String = "05:00";
 			private const TIMER_INTERVAL:int = 10;
 			
-			private const RECO_READY:Number = 0x2A7E3B;
-			private const RECO_DISABLED:Number = 0xADA2A2;
-			private const RECO_RECORDING:Number = 0x931927;
+			private const RECO_READY:String = "icon_ready.png";
+			private const RECO_DISABLED:String = "icon_disable.png";
+			private const RECO_RECORDING:String = "icon_recording.png";
 			
 			
 			private var RECO_READY_STR:String = "Ready";
@@ -60,7 +60,7 @@
 			
 			
 			[Bindable]
-			private var borderColor:Number=RECO_READY;
+			private var btnImage:String=RECO_READY;
 			
 			protected function initCreation():void
 			{
@@ -116,7 +116,7 @@
 			//start record or stop record
 			private function record():void
 			{
-				if(borderColor == RECO_DISABLED){
+				if(btnImage == RECO_DISABLED){
 					return;
 				}
 				if (!bRecording)
@@ -209,22 +209,22 @@
 				}
 			}
 			
-			private function applySourceForRecording(source:Number):void {
+			private function applySourceForRecording(source:String):void {
 				// recordBtn.source = source;
 				if(source == RECO_READY) {
 					recordBtn.toolTip = TOOL_TIP_START;
 					recordBtn.buttonMode = true;
-					borderColor = RECO_READY;
+					btnImage = RECO_READY;
 					lbTimer.text='00:00';
 					lbStatus.text = RECO_READY_STR;
 				} else if(source == RECO_RECORDING) {
 					recordBtn.toolTip = TOOL_TIP_STOP;
 					recordBtn.buttonMode = true;
-					borderColor = RECO_RECORDING;
+					btnImage = RECO_RECORDING;
 				} else {
 					recordBtn.toolTip = "";
 					recordBtn.buttonMode = false;
-					borderColor = RECO_DISABLED;
+					btnImage = RECO_DISABLED;
 				}
 			}
 			
@@ -301,7 +301,7 @@
 		]]>
 	</fx:Script>
 	<s:BorderContainer borderVisible="false" id="cvsMain" backgroundImage="@Embed(source='assets/record_bg.png')" visible="true" width="100%" height="100%">
-		<s:BorderContainer id="recordBtn" backgroundAlpha="1" top="65" left="51" borderColor="{borderColor}" borderWeight="7" width="25" height="25" toolTip="" buttonMode="true" mouseChildren="false" click="record()"/>
+		<s:Image id="recordBtn" source="assets/{btnImage}" top="62" left="41" toolTip="" buttonMode="true" mouseChildren="false" click="record()"/>
 		<s:Label id="lbTimer" color="#FFFFFF" text="00:00" fontSize="18"  fontWeight="normal" top="60" left="115" textAlign="center" width="100"/>
 		<s:Label id="lbStatus" color="#FFFFFF" text="ready" textAlign="center" fontSize="15" top="90" left="115" width="100"/>
 	</s:BorderContainer>
