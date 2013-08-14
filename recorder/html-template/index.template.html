@@ -32,6 +32,7 @@
         <!-- BEGIN Browser History required section ${useBrowserHistory}>
         <link rel="stylesheet" type="text/css" href="history/history.css" />
         <script type="text/javascript" src="history/history.js"></script>
+        <script type="text/javascript" src="jquery-1.9.1.js"></script>
         <!${useBrowserHistory} END Browser History required section -->  
             
         <script type="text/javascript" src="swfobject.js"></script>
@@ -46,10 +47,12 @@
             params.bgcolor = "${bgcolor}";
             params.allowscriptaccess = "sameDomain";
             params.allowfullscreen = "true";
+            params.flashvars = "saveUrl=&callbackMethod=debugMethod&recorderId=&startRecordingCallback=debugMethod&stopRecordingCallback=debugMethod";
             var attributes = {};
             attributes.id = "${application}";
             attributes.name = "${application}";
             attributes.align = "middle";
+            attributes.flashvars = "saveUrl=&callbackMethod=debugMethod&recorderId=&startRecordingCallback=debugMethod&stopRecordingCallback=debugMethod";
             swfobject.embedSWF(
                 "${swf}.swf", "flashContent", 
                 "${width}", "${height}", 
@@ -103,6 +106,13 @@
                 </object>
                 <!--<![endif]-->
             </object>
-        </noscript>     
+        </noscript>
+        <div id="log"></div>
+        <script type="text/javascript">
+        	function debugMethod(m){
+        		//console.log(m);
+        		$("#log").append(m);
+        	}
+        </script>     
    </body>
 </html>

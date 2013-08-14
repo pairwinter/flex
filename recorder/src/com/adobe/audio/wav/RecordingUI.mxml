@@ -43,14 +43,14 @@
 			private const RECO_RECORDING:Number = 0x931927;
 			
 			
-			private const RECO_READY_STR:String = "Ready";
-			private const RECO_RECORDING_STR:String = "Recording";
-			private const RECO_UPLOADING_STR:String = "Uploading";
-			private const RECO_UPLOADED_STR:String = "Uploaded";
+			private var RECO_READY_STR:String = "Ready";
+			private var RECO_RECORDING_STR:String = "Recording";
+			private var RECO_UPLOADING_STR:String = "Uploading";
+			private var RECO_UPLOADED_STR:String = "Uploaded";
 			
 			
-			private const TOOL_TIP_START:String = "Click to start recording";
-			private const TOOL_TIP_STOP:String = "Click to stop recording";
+			private var TOOL_TIP_START:String = "Click to start recording";
+			private var TOOL_TIP_STOP:String = "Click to stop recording";
 			
 			
 			private var bRecording:Boolean = false;
@@ -58,23 +58,38 @@
 			private var iCurSec:int =0;
 			private var haveSetUp:Boolean = false;
 			
+			
 			[Bindable]
 			private var borderColor:Number=RECO_READY;
 			
 			protected function initCreation():void
 			{
+				saveUrl = FlexGlobals.topLevelApplication.parameters["saveUrl"].toString();
+				uploadedCallback = FlexGlobals.topLevelApplication.parameters["callbackMethod"].toString();
+				recorderId = FlexGlobals.topLevelApplication.parameters["recorderId"].toString();
+				startRecordingCallback = FlexGlobals.topLevelApplication.parameters["startRecordingCallback"].toString();
+				stopRecordingCallback = FlexGlobals.topLevelApplication.parameters["stopRecordingCallback"].toString();
+				
+				var ready:String = FlexGlobals.topLevelApplication.parameters["ready"];
+				RECO_READY_STR = ready!=null?ready.toString():"Ready";
+				
+				var recording:String = FlexGlobals.topLevelApplication.parameters["recording"];
+				RECO_RECORDING_STR = recording!=null?recording.toString():"Recording";
+				
+				var uploading:String = FlexGlobals.topLevelApplication.parameters["uploading"];
+				RECO_UPLOADING_STR = uploading!=null?uploading.toString():"Uploading";
+				
+				var uploaded:String = FlexGlobals.topLevelApplication.parameters["uploaded"];
+				RECO_UPLOADED_STR = uploaded!=null?uploaded.toString():"Uploaded";
+				
+				var startTip:String = FlexGlobals.topLevelApplication.parameters["startTip"];
+				TOOL_TIP_START = startTip!=null?startTip.toString():"Click to start recording";
+				
+				var stopTip:String = FlexGlobals.topLevelApplication.parameters["stopTip"];
+				TOOL_TIP_STOP = stopTip!=null?stopTip.toString():"Click to stop recording";
+				
 				lbStatus.text = RECO_READY_STR;
 				timer = new Timer(1000);
-				try
-				{
-					saveUrl = FlexGlobals.topLevelApplication.parameters["saveUrl"].toString();
-					uploadedCallback = FlexGlobals.topLevelApplication.parameters["callbackMethod"].toString();
-					recorderId = FlexGlobals.topLevelApplication.parameters["recorderId"].toString();
-					startRecordingCallback = FlexGlobals.topLevelApplication.parameters["startRecordingCallback"].toString();
-					stopRecordingCallback = FlexGlobals.topLevelApplication.parameters["stopRecordingCallback"].toString();
-				}catch(e:Error) {
-				}
-				
 				microphoneList = Microphone.names;
 				timer.addEventListener(TimerEvent.TIMER, onTimerEnabled);
 			}
@@ -93,10 +108,7 @@
 				
 			}
 			
-			private function debugerMethod(message:String=""):void {
-				ExternalInterface.call("debugerMethod", message);
-			}
-			//call other js methods
+			//call other js methods 
 			private function executeCallBack(methodName:String,data:String=""):void {
 				ExternalInterface.call(methodName, data);
 			}
@@ -143,7 +155,6 @@
 				microphone.setLoopBack(false);
 				microphone.setSilenceLevel(0,0);
 				microphone.gain=75;
-				debugerMethod("Microphone is allow :" + !microphone.muted);
 				microphone.addEventListener(StatusEvent.STATUS, onMicStatus);
 				iCurSec =0; 
 				applySourceForRecording(RECO_RECORDING);
@@ -153,8 +164,6 @@
 			
 			private function onMicStatus(event:StatusEvent):void
 			{
-				debugerMethod("Microphone StatusEvent code :" + event.code);
-				
 				if (event.code == "Microphone.Unmuted")
 				{
 					trace("Microphone access was allowed.");
@@ -169,7 +178,6 @@
 				if (event.code == "Microphone.Unavailable"){
 					applySourceForRecording(RECO_DISABLED);
 				}
-				debugerMethod("Microphone is allow :" + !microphone.muted);
 			} 
 			
 			protected function startMicRecording():void
@@ -183,7 +191,6 @@
 			
 			private function gotMicData(micData:SampleDataEvent):void
 			{
-				debugerMethod("recording : " + micData.data.length);
 				lbStatus.text = RECO_RECORDING_STR;
 				timer.start();
 				if (baseTimer==0){
@@ -295,8 +302,8 @@
 	</fx:Script>
 	<s:BorderContainer borderVisible="false" id="cvsMain" backgroundImage="@Embed(source='assets/record_bg.png')" visible="true" width="100%" height="100%">
 		<s:BorderContainer id="recordBtn" backgroundAlpha="1" top="65" left="51" borderColor="{borderColor}" borderWeight="7" width="25" height="25" toolTip="" buttonMode="true" mouseChildren="false" click="record()"/>
-		<s:Label id="lbTimer" color="#FFFFFF" text="00:00" fontSize="18"  fontWeight="normal" top="60" left="120" textAlign="center" width="100"/>
-		<s:Label id="lbStatus" color="#FFFFFF" text="ready" textAlign="center" fontSize="15" fontWeight="bold" top="90" left="120" width="100"/>
+		<s:Label id="lbTimer" color="#FFFFFF" text="00:00" fontSize="18"  fontWeight="normal" top="60" left="115" textAlign="center" width="100"/>
+		<s:Label id="lbStatus" color="#FFFFFF" text="ready" textAlign="center" fontSize="15" top="90" left="115" width="100"/>
 	</s:BorderContainer>
 	<mx:Canvas id="cvsError" backgroundAlpha="0" visible="false" >
 		<mx:Label text="Please insert you microphone" color="red" /> 
