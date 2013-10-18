@@ -5,9 +5,9 @@
 	<fx:Script>
  
 		<![CDATA[
-			import flash.external.ExternalInterface; 
+			import flash.external.ExternalInterface;
 			import flash.utils.ByteArray;
-			import flash.utils.Timer;
+			import flash.utils.Timer; 
 			import flash.utils.getTimer;
 			
 			import mx.core.FlexGlobals;
@@ -95,7 +95,7 @@
 				var stopTip:String = FlexGlobals.topLevelApplication.parameters["stopTip"];
 				TOOL_TIP_STOP = stopTip!=null?stopTip.toString():"Click to stop recording";
 				
-				lbStatus.text = RECO_READY_STR;
+				lbStatus.text = RECO_READY_STR; 
 				timer = new Timer(1000);
 				microphoneList = Microphone.names;
 				timer.addEventListener(TimerEvent.TIMER, onTimerEnabled);
