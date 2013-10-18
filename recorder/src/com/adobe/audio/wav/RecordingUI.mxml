@@ -7,7 +7,7 @@
 		<![CDATA[
 			import flash.external.ExternalInterface;
 			import flash.utils.ByteArray;
-			import flash.utils.Timer; 
+			import flash.utils.Timer;
 			import flash.utils.getTimer;
 			
 			import mx.core.FlexGlobals;
@@ -57,6 +57,8 @@
 			private var iCurSec:int =0;
 			private var haveSetUp:Boolean = false;
 			
+			private var isButtonDisabled:Boolean = false;
+			
 			[Embed(source="assets/icon_ready.png")]
 			private var readyImage:Class;
 			
@@ -76,6 +78,8 @@
 				recorderId = FlexGlobals.topLevelApplication.parameters["recorderId"].toString();
 				startRecordingCallback = FlexGlobals.topLevelApplication.parameters["startRecordingCallback"].toString();
 				stopRecordingCallback = FlexGlobals.topLevelApplication.parameters["stopRecordingCallback"].toString();
+				isButtonDisabled = FlexGlobals.topLevelApplication.parameters["isButtonDisabled"].toString() == "true";
+				
 				
 				var ready:String = FlexGlobals.topLevelApplication.parameters["ready"];
 				RECO_READY_STR = ready!=null?ready.toString():"Ready";
@@ -99,6 +103,7 @@
 				timer = new Timer(1000);
 				microphoneList = Microphone.names;
 				timer.addEventListener(TimerEvent.TIMER, onTimerEnabled);
+				setButtonDisabled(isButtonDisabled);
 			}
 			
 			private function exposeMethods():void {
