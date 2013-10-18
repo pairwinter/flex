@@ -78,9 +78,9 @@
 				recorderId = FlexGlobals.topLevelApplication.parameters["recorderId"].toString();
 				startRecordingCallback = FlexGlobals.topLevelApplication.parameters["startRecordingCallback"].toString();
 				stopRecordingCallback = FlexGlobals.topLevelApplication.parameters["stopRecordingCallback"].toString();
-				var isDisabled = FlexGlobals.topLevelApplication.parameters["isButtonDisabled"];
+				var isDisabled:String = FlexGlobals.topLevelApplication.parameters["isButtonDisabled"];
 				if(isDisabled != null){
-					isButtonDisabled = ready.toString() == "true";
+					isButtonDisabled = isDisabled.toString() == "true";
 				}
 				
 				
