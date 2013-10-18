@@ -14,9 +14,7 @@
     <sourceAttachmentPath/>
   </compiler>
   <applications>
-    <application path="com/adobe/audio/wav/RecordingUI3.mxml"/>
     <application path="test.mxml"/>
-    <application path="com/adobe/audio/wav/RecordingUI2.mxml"/>
     <application path="com/adobe/audio/wav/RecordingUI.mxml"/>
   </applications>
   <modules/>

@@ -5,7 +5,7 @@
 	<fx:Script>
  
 		<![CDATA[
-			import flash.external.ExternalInterface;
+			import flash.external.ExternalInterface; 
 			import flash.utils.ByteArray;
 			import flash.utils.Timer;
 			import flash.utils.getTimer;
