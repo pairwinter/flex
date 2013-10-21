@@ -107,7 +107,6 @@
 				timer.addEventListener(TimerEvent.TIMER, onTimerEnabled);
 
 				isButtonDisabled = ExternalInterface.call(adjustRecordingStatus);
-				Alert.show(isButtonDisabled + "");
 				setButtonDisabled(isButtonDisabled);
 			}
 			
