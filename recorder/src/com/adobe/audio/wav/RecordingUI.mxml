@@ -10,6 +10,7 @@
 			import flash.utils.Timer;
 			import flash.utils.getTimer;
 			
+			import mx.controls.Alert;
 			import mx.core.FlexGlobals;
 			
 			[Bindable] private var microphoneList:Array;
@@ -106,6 +107,7 @@
 				timer.addEventListener(TimerEvent.TIMER, onTimerEnabled);
 
 				isButtonDisabled = ExternalInterface.call(adjustRecordingStatus);
+				Alert.show(isButtonDisabled + "");
 				setButtonDisabled(isButtonDisabled);
 			}
 			
