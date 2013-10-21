@@ -20,6 +20,7 @@
 			private var recorderId:String = "recorder";
 			private var startRecordingCallback:String ="";
 			private var stopRecordingCallback:String ="";
+			private var adjustRecordingStatus:String ="";
 			
 			protected var soundRecording:ByteArray;
 			protected var soundRecordingWAV:ByteArray;
@@ -77,12 +78,9 @@
 				uploadedCallback = FlexGlobals.topLevelApplication.parameters["callbackMethod"].toString();
 				recorderId = FlexGlobals.topLevelApplication.parameters["recorderId"].toString();
 				startRecordingCallback = FlexGlobals.topLevelApplication.parameters["startRecordingCallback"].toString();
-				stopRecordingCallback = FlexGlobals.topLevelApplication.parameters["stopRecordingCallback"].toString();
-				var isDisabled:String = FlexGlobals.topLevelApplication.parameters["isButtonDisabled"];
-				if(isDisabled != null){
-					isButtonDisabled = isDisabled.toString() == "true";
-				}
 				
+				stopRecordingCallback = FlexGlobals.topLevelApplication.parameters["stopRecordingCallback"].toString();
+				adjustRecordingStatus = FlexGlobals.topLevelApplication.parameters["adjustRecordingStatus"].toString();
 				
 				var ready:String = FlexGlobals.topLevelApplication.parameters["ready"];
 				RECO_READY_STR = ready!=null?ready.toString():"Ready";
@@ -106,6 +104,8 @@
 				timer = new Timer(1000);
 				microphoneList = Microphone.names;
 				timer.addEventListener(TimerEvent.TIMER, onTimerEnabled);
+
+				isButtonDisabled = ExternalInterface.call(adjustRecordingStatus);
 				setButtonDisabled(isButtonDisabled);
 			}
 			
